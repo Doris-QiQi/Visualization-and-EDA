@@ -2,7 +2,7 @@
 title: "ggplot2 part I"
 author: "Jingyi Yao"
 date: "`r Sys.Date()`"
-output: html_document
+output: github_document
 ---
 ### global settings of the layout format
 ```{r}
