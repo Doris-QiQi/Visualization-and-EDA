@@ -1,0 +1,390 @@
+---
+title: "ggplot2 part 2"
+author: "Jingyi Yao"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+```
+
+## load `tidyverse` and `ggridges`
+```{r,warning=TRUE,message=FALSE}
+library(tidyverse)
+library(ggridges)
+```
+
+### load the weather dataset
+```{r,message=FALSE}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USC00519397", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USC00519397 = "Waikiki_HA",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+
+```
+
+
+## scatterplot -- but better this time
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax,color=name)) +  # color = name
+  geom_point(alpha = .5)
+
+```
+
+
+## Labels
+
+### `+ labs(x=" ",y=" ",caption=" ")` labs with an s and the titles are in quotation marks
+### title=, x=,y=
+### `caption` is an annotation to the plot
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) + 
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  )
+```
+
+
+
+## Scales -- change the axis and color
+
+### customize the x-axis labels using `scale_x_continuous(breaks=,labels=)`
+### `breaks = vector(where to mark the data)` numeric vector showing the location of tick marks
+### `labels = vector(caption)` a character vector of the marks
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) + 
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package") + 
+  scale_x_continuous(
+    breaks = c(-15, 0, 15), 
+    labels = c("-15º C", "0", "15"))
+```
+
+
+
+### customize the y-axis values using `scale_y_continuous(trans=,position=)`
+### `sqrt` the values in y
+### `trans = mathematical transformation function`
+### `position = left or right` where to put the labels
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) + 
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package") + 
+  scale_x_continuous(
+    breaks = c(-15, 0, 15), 
+    labels = c("-15ºC", "0", "15"),
+    limits = c(-20, 30)) + 
+  scale_y_continuous(
+    trans = "sqrt", 
+    position = "right")
+```
+
+
+### change the scale color using `hue`
+### `scale_color_hue(name=column,h= the color range)` the color range is an **interval**
+### `name` is the column that the colors are assigned to
+### `h` is a numeric vector to store the color range
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) + 
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package") + 
+  scale_color_hue(name = "Location", h = c(100,400))
+```
+
+
+### use the color map in the `viridis` package
+### specify the color range is **discrete** or **continuous**
+### `viridis::scale_color_viridis(name = "Location",discrete = TRUE)`
+### `name=` is still the column
+### `discrete = T OR F` means whether the column is discrete or continuous
+```{r}
+ggp_temp_plot = 
+  weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) + 
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) + 
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )
+
+ggp_temp_plot
+```
+
+
+
+## Themes -- +theme()
+
+### `+theme(legend.position= "bottom")` change the legend position and the postion is a character
+### the position can be `"none"` which means removing the legend
+### append the `theme(legend.position=" ")` to a plot
+```{r}
+ggp_temp_plot + 
+  theme(legend.position = "bottom") # a character in quotation marks
+```
+
+### change the background color into `bw` or `classic` or `excel` or `minimal`
+
+### the order of `theme_bw` and `theme()` cannot be changed
+### `theme()` should be the last line
+### white
+```{r}
+ggp_temp_plot + 
+  theme_bw() + 
+  theme(legend.position = "bottom")
+```
+
+### excel
+### grey with lines
+```{r}
+ggp_temp_plot + 
+  ggthemes::theme_excel() + 
+  theme(legend.position = "bottom")
+```
+
+### classic
+### blank
+```{r}
+ggp_temp_plot + 
+  theme_classic() + 
+  theme(legend.position = "bottom")
+```
+
+### minimal
+### white
+```{r}
+ggp_temp_plot + 
+  theme_minimal() + 
+  theme(legend.position = "bottom")
+```
+
+## Setting Option
+```{r}
+
+```
+
+
+## Data in `geom()`
+
+### `geom_line()` is the line that connects the points in order
+```{r}
+central_park = 
+  weather_df %>% 
+  filter(name == "CentralPark_NY")
+
+waikiki = 
+  weather_df %>% 
+  filter(name == "Waikiki_HA")
+
+ggplot(data = waikiki, aes(x = date, y = tmax, color = name)) + 
+  geom_point() + 
+  geom_line(data = central_park)
+```
+
+
+## Patchwork (pacakge)
+
+### using `facet` to line **related** graphs in one plot
+### using `patchwork` package to place **different** graphs in one plot
+
+#### plot separate plots first
+```{r}
+tmax_tmin_p = 
+  weather_df %>% 
+  ggplot(aes(x = tmax, y = tmin, color = name)) + 
+  geom_point(alpha = .5) +
+  theme(legend.position = "none")
+
+tmax_tmin_p
+
+prcp_dens_p = 
+  weather_df %>% 
+  filter(prcp > 0) %>% 
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density(alpha = .5) + 
+  theme(legend.position = "none")
+
+prcp_dens_p
+
+tmax_date_p = 
+  weather_df %>% 
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "bottom")
+
+tmax_date_p
+
+```
+
+### load the `patchwork` package
+### use `+`, `/`,`()` to set the layout
+```{r}
+library(patchwork)
+tmax_tmin_p + prcp_dens_p  # side by side
+
+tmax_tmin_p / prcp_dens_p  # stacked
+
+(tmax_tmin_p + prcp_dens_p) / tmax_date_p   # first side by side and then stacked
+
+```
+
+
+
+## Data Manipulation
+
+### `forcats::fct_relevel()` the violin plot
+### relevel by the order or name and the character vector specified
+```{r}
+weather_df %>%
+  mutate(name = forcats::fct_relevel(name, c("Waikiki_HA", "CentralPark_NY", "Waterhole_WA"))) %>% 
+  ggplot(aes(x = name, y = tmax)) + 
+  geom_violin(aes(fill = name), color = "blue", alpha = .5) + 
+  theme(legend.position = "bottom")
+```
+
+### `reorder()` the violin plot
+```{r}
+weather_df %>%
+  mutate(name = forcats::fct_reorder(name, tmax)) %>% 
+  ggplot(aes(x = name, y = tmax)) + 
+  geom_violin(aes(fill = name), color = "blue", alpha = .5) + 
+  theme(legend.position = "bottom")
+```
+
+
+
+### `relevel()` the boxplot
+```{r}
+weather_df %>% 
+ mutate(name = fct_relevel(name,"Waikiki_HA")) %>%
+ ggplot(aes(x=name,y=tmax))+geom_boxplot()
+  
+```
+
+### `reorder()` the boxplot
+```{r}
+weather_df %>% 
+ mutate(name = fct_reorder(name,tmax)) %>%
+ ggplot(aes(x=name,y=tmax))+geom_boxplot()
+  
+
+```
+
+### shows the distribution of bdi in each visit -- show the 4 boxplots side by side
+### add *visit* as a variable in the dataset
+### x=visit,y=bdi
+### arrange the order in one way
+```{r}
+pulse_data = 
+  haven::read_sas("./data/public_pulse_data.sas7bdat") %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m,
+    names_to = "visit", 
+    names_prefix = "bdi_score_",
+    values_to = "bdi") %>%
+  select(id, visit, everything()) %>%
+  mutate(
+    visit = recode(visit, "bl" = "00m"),
+    visit = factor(visit, levels = str_c(c("00", "01", "06", "12"), "m"))) %>%
+  arrange(id, visit)
+
+ggplot(pulse_data, aes(x = visit, y = bdi)) + 
+  geom_boxplot()
+```
+
+### arrange the order in another way -- `relevel()``
+```{r}
+pulse_data = 
+  haven::read_sas("./data/public_pulse_data.sas7bdat") %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m,
+    names_to = "visit", 
+    names_prefix = "bdi_score_",
+    values_to = "bdi") %>%
+  select(id, visit, everything()) %>%
+  mutate(
+    visit = fct_relevel(visit,"bl")   # use the fct_relevel()
+  )
+
+ggplot(pulse_data, aes(x = visit, y = bdi)) + 
+  geom_boxplot()
+```
+
+```{r}
+pup_data = 
+  read_csv("./data/FAS_pups.csv", col_types = "ciiiii") %>%
+  janitor::clean_names() %>%
+  mutate(sex = recode(sex, `1` = "male", `2` = "female")) 
+
+litter_data = 
+  read_csv("./data/FAS_litters.csv", col_types = "ccddiiii") %>%
+  janitor::clean_names() %>%
+  separate(group, into = c("dose", "day_of_tx"), sep = 3)
+
+fas_data = left_join(pup_data, litter_data, by = "litter_number") 
+
+fas_data %>% 
+  select(sex, dose, day_of_tx, pd_ears:pd_walk) %>% 
+  pivot_longer(
+    pd_ears:pd_walk,
+    names_to = "outcome", 
+    values_to = "pn_day") %>% 
+  drop_na() %>% 
+  mutate(outcome = forcats::fct_reorder(outcome, pn_day, median)) %>% 
+  ggplot(aes(x = dose, y = pn_day)) + 
+  geom_violin() + 
+  facet_grid(day_of_tx ~ outcome)
+```
+
+
+
+
+
+
