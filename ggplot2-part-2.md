@@ -1,27 +1,26 @@
----
-title: "ggplot2 part 2"
-author: "Jingyi Yao"
-date: "`r Sys.Date()`"
-output: github_document
----
+ggplot2 part 2
+================
+Jingyi Yao
+2022-10-17
 
-```{r}
+``` r
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
   out.width = "90%"
 )
-
 ```
 
 ## load `tidyverse` and `ggridges`
-```{r,warning=TRUE,message=FALSE}
+
+``` r
 library(tidyverse)
 library(ggridges)
 ```
 
 ### load the weather dataset
-```{r,message=FALSE}
+
+``` r
 weather_df = 
   rnoaa::meteo_pull_monitors(
     c("USW00094728", "USC00519397", "USS0023B17S"),
@@ -37,26 +36,29 @@ weather_df =
     tmin = tmin / 10,
     tmax = tmax / 10) %>%
   select(name, id, everything())
-
 ```
 
+## scatterplot – but better this time
 
-## scatterplot -- but better this time
-
-```{r}
+``` r
 weather_df %>% 
   ggplot(aes(x = tmin, y = tmax,color=name)) +  # color = name
   geom_point(alpha = .5)
-
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
 
 ## Labels
 
 ### `+ labs(x=" ",y=" ",caption=" ")` labs with an s and the titles are in quotation marks
+
 ### title=, x=,y=
+
 ### `caption` is an annotation to the plot
-```{r}
+
+``` r
 weather_df %>% 
   ggplot(aes(x = tmin, y = tmax)) + 
   geom_point(aes(color = name), alpha = .5) + 
@@ -68,14 +70,19 @@ weather_df %>%
   )
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
 
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
-## Scales -- change the axis and color
+## Scales – change the axis and color
 
 ### customize the x-axis labels using `scale_x_continuous(breaks=,labels=)`
+
 ### `breaks = vector(where to mark the data)` numeric vector showing the location of tick marks
+
 ### `labels = vector(caption)` a character vector of the marks
-```{r}
+
+``` r
 weather_df %>% 
   ggplot(aes(x = tmin, y = tmax)) + 
   geom_point(aes(color = name), alpha = .5) + 
@@ -89,13 +96,19 @@ weather_df %>%
     labels = c("-15º C", "0", "15"))
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
 
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
 
 ### customize the y-axis values using `scale_y_continuous(trans=,position=)`
+
 ### `sqrt` the values in y
+
 ### `trans = mathematical transformation function`
+
 ### `position = left or right` where to put the labels
-```{r}
+
+``` r
 weather_df %>% 
   ggplot(aes(x = tmin, y = tmax)) + 
   geom_point(aes(color = name), alpha = .5) + 
@@ -113,12 +126,23 @@ weather_df %>%
     position = "right")
 ```
 
+    ## Warning in self$trans$transform(x): NaNs produced
+
+    ## Warning: Transformation introduced infinite values in continuous y-axis
+
+    ## Warning: Removed 90 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />
 
 ### change the scale color using `hue`
+
 ### `scale_color_hue(name=column,h= the color range)` the color range is an **interval**
+
 ### `name` is the column that the colors are assigned to
+
 ### `h` is a numeric vector to store the color range
-```{r}
+
+``` r
 weather_df %>% 
   ggplot(aes(x = tmin, y = tmax)) + 
   geom_point(aes(color = name), alpha = .5) + 
@@ -130,13 +154,21 @@ weather_df %>%
   scale_color_hue(name = "Location", h = c(100,400))
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-8-1.png" width="90%" />
 
 ### use the color map in the `viridis` package
+
 ### specify the color range is **discrete** or **continuous**
+
 ### `viridis::scale_color_viridis(name = "Location",discrete = TRUE)`
+
 ### `name=` is still the column
+
 ### `discrete = T OR F` means whether the column is discrete or continuous
-```{r}
+
+``` r
 ggp_temp_plot = 
   weather_df %>% 
   ggplot(aes(x = tmin, y = tmax)) + 
@@ -155,63 +187,94 @@ ggp_temp_plot =
 ggp_temp_plot
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
 
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-9-1.png" width="90%" />
 
-## Themes -- +theme()
+## Themes – +theme()
 
 ### `+theme(legend.position= "bottom")` change the legend position and the postion is a character
+
 ### the position can be `"none"` which means removing the legend
+
 ### append the `theme(legend.position=" ")` to a plot
-```{r}
+
+``` r
 ggp_temp_plot + 
   theme(legend.position = "bottom") # a character in quotation marks
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
+
 ### change the background color into `bw` or `classic` or `excel` or `minimal`
 
 ### the order of `theme_bw` and `theme()` cannot be changed
+
 ### `theme()` should be the last line
+
 ### white
-```{r}
+
+``` r
 ggp_temp_plot + 
   theme_bw() + 
   theme(legend.position = "bottom")
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
+
 ### excel
+
 ### grey with lines
-```{r}
+
+``` r
 ggp_temp_plot + 
   ggthemes::theme_excel() + 
   theme(legend.position = "bottom")
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
+
 ### classic
+
 ### blank
-```{r}
+
+``` r
 ggp_temp_plot + 
   theme_classic() + 
   theme(legend.position = "bottom")
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
+
 ### minimal
+
 ### white
-```{r}
+
+``` r
 ggp_temp_plot + 
   theme_minimal() + 
   theme(legend.position = "bottom")
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+
 ## Setting Option
-```{r}
-
-```
-
 
 ## Data in `geom()`
 
 ### `geom_line()` is the line that connects the points in order
-```{r}
+
+``` r
 central_park = 
   weather_df %>% 
   filter(name == "CentralPark_NY")
@@ -225,14 +288,19 @@ ggplot(data = waikiki, aes(x = date, y = tmax, color = name)) +
   geom_line(data = central_park)
 ```
 
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-16-1.png" width="90%" />
 
 ## Patchwork (pacakge)
 
 ### using `facet` to line **related** graphs in one plot
+
 ### using `patchwork` package to place **different** graphs in one plot
 
 #### plot separate plots first
-```{r}
+
+``` r
 tmax_tmin_p = 
   weather_df %>% 
   ggplot(aes(x = tmax, y = tmin, color = name)) + 
@@ -240,7 +308,13 @@ tmax_tmin_p =
   theme(legend.position = "none")
 
 tmax_tmin_p
+```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-17-1.png" width="90%" />
+
+``` r
 prcp_dens_p = 
   weather_df %>% 
   filter(prcp > 0) %>% 
@@ -249,7 +323,11 @@ prcp_dens_p =
   theme(legend.position = "none")
 
 prcp_dens_p
+```
 
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-17-2.png" width="90%" />
+
+``` r
 tmax_date_p = 
   weather_df %>% 
   ggplot(aes(x = date, y = tmax, color = name)) + 
@@ -258,28 +336,58 @@ tmax_date_p =
   theme(legend.position = "bottom")
 
 tmax_date_p
-
 ```
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+    ## Warning: Removed 3 rows containing non-finite values (stat_smooth).
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-17-3.png" width="90%" />
 
 ### load the `patchwork` package
+
 ### use `+`, `/`,`()` to set the layout
-```{r}
+
+``` r
 library(patchwork)
 tmax_tmin_p + prcp_dens_p  # side by side
-
-tmax_tmin_p / prcp_dens_p  # stacked
-
-(tmax_tmin_p + prcp_dens_p) / tmax_date_p   # first side by side and then stacked
-
 ```
 
+    ## Warning: Removed 15 rows containing missing values (geom_point).
 
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-18-1.png" width="90%" />
+
+``` r
+tmax_tmin_p / prcp_dens_p  # stacked
+```
+
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-18-2.png" width="90%" />
+
+``` r
+(tmax_tmin_p + prcp_dens_p) / tmax_date_p   # first side by side and then stacked
+```
+
+    ## Warning: Removed 15 rows containing missing values (geom_point).
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+    ## Warning: Removed 3 rows containing non-finite values (stat_smooth).
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-18-3.png" width="90%" />
 
 ## Data Manipulation
 
 ### `forcats::fct_relevel()` the violin plot
+
 ### relevel by the order or name and the character vector specified
-```{r}
+
+``` r
 weather_df %>%
   mutate(name = forcats::fct_relevel(name, c("Waikiki_HA", "CentralPark_NY", "Waterhole_WA"))) %>% 
   ggplot(aes(x = name, y = tmax)) + 
@@ -287,8 +395,13 @@ weather_df %>%
   theme(legend.position = "bottom")
 ```
 
+    ## Warning: Removed 3 rows containing non-finite values (stat_ydensity).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-19-1.png" width="90%" />
+
 ### `reorder()` the violin plot
-```{r}
+
+``` r
 weather_df %>%
   mutate(name = forcats::fct_reorder(name, tmax)) %>% 
   ggplot(aes(x = name, y = tmax)) + 
@@ -296,30 +409,43 @@ weather_df %>%
   theme(legend.position = "bottom")
 ```
 
+    ## Warning: Removed 3 rows containing non-finite values (stat_ydensity).
 
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-20-1.png" width="90%" />
 
 ### `relevel()` the boxplot
-```{r}
+
+``` r
 weather_df %>% 
  mutate(name = fct_relevel(name,"Waikiki_HA")) %>%
  ggplot(aes(x=name,y=tmax))+geom_boxplot()
-  
 ```
 
+    ## Warning: Removed 3 rows containing non-finite values (stat_boxplot).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-21-1.png" width="90%" />
+
 ### `reorder()` the boxplot
-```{r}
+
+``` r
 weather_df %>% 
  mutate(name = fct_reorder(name,tmax)) %>%
  ggplot(aes(x=name,y=tmax))+geom_boxplot()
-  
-
 ```
 
-### shows the distribution of bdi in each visit -- show the 4 boxplots side by side
+    ## Warning: Removed 3 rows containing non-finite values (stat_boxplot).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-22-1.png" width="90%" />
+
+### shows the distribution of bdi in each visit – show the 4 boxplots side by side
+
 ### add *visit* as a variable in the dataset
+
 ### x=visit,y=bdi
+
 ### arrange the order in one way
-```{r}
+
+``` r
 pulse_data = 
   haven::read_sas("./data/public_pulse_data.sas7bdat") %>%
   janitor::clean_names() %>%
@@ -338,8 +464,13 @@ ggplot(pulse_data, aes(x = visit, y = bdi)) +
   geom_boxplot()
 ```
 
-### arrange the order in another way -- `relevel()``
-```{r}
+    ## Warning: Removed 879 rows containing non-finite values (stat_boxplot).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-23-1.png" width="90%" />
+
+### arrange the order in another way – \`relevel()\`\`
+
+``` r
 pulse_data = 
   haven::read_sas("./data/public_pulse_data.sas7bdat") %>%
   janitor::clean_names() %>%
@@ -357,7 +488,11 @@ ggplot(pulse_data, aes(x = visit, y = bdi)) +
   geom_boxplot()
 ```
 
-```{r}
+    ## Warning: Removed 879 rows containing non-finite values (stat_boxplot).
+
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-24-1.png" width="90%" />
+
+``` r
 pup_data = 
   read_csv("./data/FAS_pups.csv", col_types = "ciiiii") %>%
   janitor::clean_names() %>%
@@ -383,8 +518,4 @@ fas_data %>%
   facet_grid(day_of_tx ~ outcome)
 ```
 
-
-
-
-
-
+<img src="ggplot2-part-2_files/figure-gfm/unnamed-chunk-25-1.png" width="90%" />
